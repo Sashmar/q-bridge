@@ -173,21 +173,52 @@
                     Switch Context
                 </button>
             </div>
-
             <p id="opt-desc">Define your network connections to separate delivery zones.</p>
-
             <textarea id="user-input" placeholder="[[0,1], [1,2]...]">[[0,1], [1,2], [2,0]]</textarea>
-
             <button onclick="runOptimization()" id="btn-opt">Optimize Route</button>
             <div id="viz"></div>
             <div class="console" id="out-opt">Ready.</div>
         </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>⚡ Quantum RNG Module</h2>
+                <span style="font-size: 0.8rem; background: #334155; padding: 4px 8px; border-radius: 4px;">Dev
+                    Tool</span>
+            </div>
+
+            <p>Simulate a qubit superposition (Hadamard Gate) locally.</p>
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 1rem;">
+                <button onclick="getQuantumBit()" id="btn-rng" style="margin-top:0;">Generate Bit</button>
+
+                <div id="rng-display" style="
+                    background: #000; 
+                    border: 1px solid #333; 
+                    color: #38bdf8; 
+                    font-family: 'JetBrains Mono', monospace; 
+                    font-size: 1.5rem; 
+                    width: 60px; 
+                    height: 44px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    border-radius: 8px;">
+                    -
+                </div>
+            </div>
+
+            <div class="console" id="console-rng" style="margin-top: 10px; min-height: 40px; font-size: 0.75rem;">
+                Ready to collapse wave function...
+            </div>
+        </div>
     </div>
 
     <script>
-        // Only change this if running locally vs cloud
+        // Note: When deployed, this empty string means "use the same server I came from"
         const API_URL = "";
 
+        // --- CARD 1: ENTROPY ENGINE ---
         async function getQuantumRandom() {
             const out = document.getElementById("out-rand");
             out.innerText = "Connecting to Quantum Core...";
@@ -195,9 +226,12 @@
                 const res = await fetch(`/generate-quantum-number`);
                 const data = await res.json();
                 out.innerText = ">> Success:\n" + JSON.stringify(data.raw_data);
-            } catch (e) { out.innerText = "Error connecting to server."; }
+            } catch (e) {
+                out.innerText = "Error connecting to server.";
+            }
         }
 
+        // --- CARD 2: OPTIMIZER (LOGISTICS/FINANCE) ---
         async function runOptimization() {
             const out = document.getElementById("out-opt");
             const viz = document.getElementById("viz");
@@ -216,21 +250,19 @@
             viz.innerHTML = '';
             out.innerText = "Building graph & optimizing...";
 
-            // Simple logic to scatter nodes in a circle based on how many there are
+            // Logic to scatter nodes in a circle
             const uniqueNodes = new Set(userRoutes.flat());
             const nodeCount = uniqueNodes.size;
             const radius = 80;
             const centerX = viz.offsetWidth / 2;
             const centerY = viz.offsetHeight / 2;
-
-            const nodeCoords = {}; // Store x,y for drawing lines
+            const nodeCoords = {};
 
             Array.from(uniqueNodes).forEach((nodeId, index) => {
                 const angle = (index / nodeCount) * 2 * Math.PI;
                 const x = centerX + radius * Math.cos(angle) - 15;
                 const y = centerY + radius * Math.sin(angle) - 15;
-
-                nodeCoords[nodeId] = { x: x + 15, y: y + 15 }; // Center point
+                nodeCoords[nodeId] = { x: x + 15, y: y + 15 };
 
                 const div = document.createElement("div");
                 div.className = "node node-default";
@@ -241,7 +273,7 @@
                 viz.appendChild(div);
             });
 
-            // Draw Lines (Connections)
+            // Draw Lines
             userRoutes.forEach(pair => {
                 const p1 = nodeCoords[pair[0]];
                 const p2 = nodeCoords[pair[1]];
@@ -290,26 +322,57 @@
             container.appendChild(line);
         }
 
+        // --- CONTEXT SWITCHER (LOGISTICS VS FINANCE) ---
         let isFinanceMode = false;
 
         function toggleMode() {
             isFinanceMode = !isFinanceMode;
-
             const title = document.getElementById("opt-title");
             const desc = document.getElementById("opt-desc");
             const btn = document.getElementById("btn-opt");
 
             if (isFinanceMode) {
-                // WALL STREET MODE
                 title.innerText = "2. Portfolio Risk Optimizer";
                 desc.innerText = "Enter correlated assets (stocks). The AI will separate them to hedge risk.";
                 btn.innerText = "Optimize Portfolio Balance";
             } else {
-                // LOGISTICS MODE
                 title.innerText = "2. Logistics Optimizer";
                 desc.innerText = "Define your network connections to separate delivery zones.";
                 btn.innerText = "Optimize Route";
             }
+        }
+
+        // --- NEW: CARD 3 (QUANTUM DEV TOOL) ---
+        async function getQuantumBit() {
+            const display = document.getElementById("rng-display");
+            const consoleLog = document.getElementById("console-rng");
+            const btn = document.getElementById("btn-rng");
+
+            // UI Loading State
+            display.innerText = "⏳";
+            consoleLog.innerText = "Initializing Qubit... Applying H-Gate...";
+            btn.disabled = true;
+
+            try {
+                // Call the new Python Endpoint
+                const res = await fetch("/api/quantum-random");
+                const data = await res.json();
+
+                if (data.status === "success") {
+                    display.innerText = data.value;
+                    // Green for 1, Blue for 0
+                    display.style.color = data.value === 1 ? "#4ade80" : "#38bdf8";
+                    consoleLog.innerText = `>> Success: ${data.explanation}`;
+                } else {
+                    display.innerText = "❌";
+                    consoleLog.innerText = "Error: " + data.message;
+                }
+            } catch (e) {
+                console.error(e);
+                display.innerText = "⚠️";
+                consoleLog.innerText = "Connection Error. Is server.py running?";
+            }
+            btn.disabled = false;
         }
     </script>
 </body>
