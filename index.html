@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Bridge | Quantum Intelligence</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --card-bg: rgba(31, 41, 55, 0.4);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #4ade80;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg) 70%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        header {
+            margin-top: 4rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 1rem;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 99px;
+            border: 1px solid var(--accent-glow);
+        }
+
+        /* Grid */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            width: 90%;
+            max-width: 1000px;
+            padding-bottom: 4rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Buttons */
+        button {
+            background: var(--text-main);
+            color: var(--bg);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Output Console */
+        .console {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--success);
+            min-height: 60px;
+            white-space: pre-wrap;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .console::before {
+            content: '>_';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        /* Visualization */
+        #viz {
+            height: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            position: relative;
+            margin-top: 1.5rem;
+            border: 1px dashed #333;
+        }
+
+        .node {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            font-weight: bold;
+            color: #fff;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 2;
+        }
+
+        .node-default {
+            background: #334155;
+            border: 2px solid #475569;
+        }
+
+        .group-0 {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Red Team */
+
+        .group-1 {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Blue Team */
+
+        .loading-pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Q-BRIDGE</h1>
+        <div class="subtitle">Quantum Middleware v1.0</div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Entropy Engine</h2>
+            <p>Access true, physics-based randomness from the IBM Quantum Cloud.</p>
+            <button onclick="getQuantumRandom()" id="btn-rand">
+                <span id="btn-text-rand">Generate Quantum Key</span>
+            </button>
+            <div class="console" id="out-rand">System Ready. Waiting for input...</div>
+        </div>
+
+        <div class="card">
+            <h2>Logistics Optimizer</h2>
+            <p>Solve NP-Hard Max-Cut problems using the QAOA Quantum Algorithm.</p>
+            <button onclick="runOptimization()" id="btn-opt">
+                <span id="btn-text-opt">Optimize Logistics Route</span>
+            </button>
+            <div id="viz"></div>
+            <div class="console" id="out-opt">Awaiting dataset...</div>
+        </div>
+    </div>
+
+    <script>
+        // Note: When deployed, this empty string means "use the same server I came from"
+        const API_URL = "";
+
+        // 1. Randomness Function
+        async function getQuantumRandom() {
+            const out = document.getElementById("out-rand");
+            const btn = document.getElementById("btn-rand");
+            const btnText = document.getElementById("btn-text-rand");
+
+            out.innerText = "Authenticating with IBM Cloud...";
+            out.classList.add("loading-pulse");
+            btn.disabled = true;
+            btnText.innerText = "Processing...";
+
+            try {
+                // If running locally, you might need to add http://127.0.0.1:8000 prefix if not serving static
+                const res = await fetch(`/generate-quantum-number`);
+                const data = await res.json();
+                out.classList.remove("loading-pulse");
+                out.innerText = ">> SUCCESS: \n" + JSON.stringify(data.raw_data, null, 2);
+            } catch (e) {
+                out.classList.remove("loading-pulse");
+                out.innerText = "Error: Backend not reachable. (Are you running server.py?)";
+                console.error(e);
+            }
+            btn.disabled = false;
+            btnText.innerText = "Generate Quantum Key";
+        }
+
+        // 2. Optimization Function
+        async function runOptimization() {
+            const out = document.getElementById("out-opt");
+            const viz = document.getElementById("viz");
+            const btn = document.getElementById("btn-opt");
+            const btnText = document.getElementById("btn-text-opt");
+
+            // Setup Layout
+            viz.innerHTML = '';
+            // Pentagon Layout
+            const nodes = [
+                { id: 0, x: 150, y: 40 }, { id: 1, x: 250, y: 110 },
+                { id: 2, x: 210, y: 210 }, { id: 3, x: 90, y: 210 }, { id: 4, x: 50, y: 110 }
+            ];
+
+            // Draw initial nodes
+            nodes.forEach(n => {
+                const div = document.createElement("div");
+                div.className = "node node-default";
+                div.style.left = n.x + "px";
+                div.style.top = n.y + "px";
+                div.innerText = n.id;
+                div.id = `node-${n.id}`;
+                viz.appendChild(div);
+            });
+
+            out.innerText = "Transpiling circuit to QAOA Gates...";
+            out.classList.add("loading-pulse");
+            btn.disabled = true;
+            btnText.innerText = "Optimizing...";
+
+            try {
+                const payload = { routes: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0], [0, 2]] };
+
+                const res = await fetch(`/optimize-logistics`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                const resData = data.optimization_result;
+
+                out.classList.remove("loading-pulse");
+                out.innerText = `>> OPTIMIZATION COMPLETE\nMax Cuts: ${resData.max_cuts}`;
+
+                // Update Visuals
+                resData.group_a.forEach(id => {
+                    const el = document.getElementById(`node-${id}`);
+                    el.className = "node group-0";
+                });
+                resData.group_b.forEach(id => {
+                    const el = document.getElementById(`node-${id}`);
+                    el.className = "node group-1";
+                });
+
+            } catch (e) {
+                out.classList.remove("loading-pulse");
+                out.innerText = "Error: Backend not reachable.";
+                console.error(e);
+            }
+            btn.disabled = false;
+            btnText.innerText = "Optimize Logistics Route";
+        }
+    </script>
+</body>
+
+</html>

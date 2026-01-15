@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+qiskit
+qiskit-ibm-runtime
+qiskit-algorithms
+qiskit-optimization
+networkx
+numpy
+pydantic
