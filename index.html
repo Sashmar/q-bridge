@@ -166,13 +166,19 @@
         </div>
 
         <div class="card">
-            <h2>2. Custom Logistics Solver</h2>
-            <p>Define your network connections below. Format: <code>[[0,1], [1,2]...]</code></p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 id="opt-title">2. Logistics Optimizer</h2>
+                <button onclick="toggleMode()"
+                    style="width: auto; padding: 5px 15px; font-size: 0.8rem; background: #334155;">
+                    Switch Context
+                </button>
+            </div>
 
-            <textarea id="user-input"
-                placeholder="Enter routes: [[0,1], [1,2], [2,0]]">[[0,1], [1,2], [2,3], [3,4], [4,0], [0,2]]</textarea>
+            <p id="opt-desc">Define your network connections to separate delivery zones.</p>
 
-            <button onclick="runOptimization()" id="btn-opt">Optimize My Route</button>
+            <textarea id="user-input" placeholder="[[0,1], [1,2]...]">[[0,1], [1,2], [2,0]]</textarea>
+
+            <button onclick="runOptimization()" id="btn-opt">Optimize Route</button>
             <div id="viz"></div>
             <div class="console" id="out-opt">Ready.</div>
         </div>
@@ -282,6 +288,28 @@
             line.style.top = y1 + "px";
             line.style.transform = `rotate(${angle}deg)`;
             container.appendChild(line);
+        }
+
+        let isFinanceMode = false;
+
+        function toggleMode() {
+            isFinanceMode = !isFinanceMode;
+
+            const title = document.getElementById("opt-title");
+            const desc = document.getElementById("opt-desc");
+            const btn = document.getElementById("btn-opt");
+
+            if (isFinanceMode) {
+                // WALL STREET MODE
+                title.innerText = "2. Portfolio Risk Optimizer";
+                desc.innerText = "Enter correlated assets (stocks). The AI will separate them to hedge risk.";
+                btn.innerText = "Optimize Portfolio Balance";
+            } else {
+                // LOGISTICS MODE
+                title.innerText = "2. Logistics Optimizer";
+                desc.innerText = "Define your network connections to separate delivery zones.";
+                btn.innerText = "Optimize Route";
+            }
         }
     </script>
 </body>
